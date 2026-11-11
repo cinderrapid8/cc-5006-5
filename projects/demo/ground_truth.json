@@ -1,0 +1,34 @@
+{
+  "true_offset_s": 1.35,
+  "camera_clock_lag_s": 2.0,
+  "flash_video_times_s": [
+    2.5,
+    7.0,
+    11.5,
+    16.0
+  ],
+  "pulse_data_times_s": [
+    3.85,
+    8.35,
+    12.85,
+    17.35
+  ],
+  "temp_gap_data_s": [
+    10.0,
+    14.0
+  ],
+  "rollback_data_s": {
+    "physical_span": [
+      15.4,
+      16.6
+    ],
+    "misstamped_as": [
+      13.8,
+      15.0
+    ]
+  },
+  "data_range_s": [
+    2.0,
+    18.0
+  ]
+}

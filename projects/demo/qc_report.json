@@ -1,0 +1,60 @@
+{
+  "all_pass": true,
+  "checks": [
+    {
+      "check": "offset_fit",
+      "pass": true,
+      "detail": "fitted +1.3366s vs true +1.350s; range [+1.3068, +1.3664]"
+    },
+    {
+      "check": "flash_pulse_1",
+      "pass": true,
+      "detail": "frame 75 video_t=2.5 data_t=3.8402 active=1"
+    },
+    {
+      "check": "flash_pulse_2",
+      "pass": true,
+      "detail": "frame 210 video_t=7.0 data_t=8.3467 active=1"
+    },
+    {
+      "check": "flash_pulse_3",
+      "pass": true,
+      "detail": "frame 345 video_t=11.5 data_t=12.8533 active=1"
+    },
+    {
+      "check": "flash_pulse_4",
+      "pass": true,
+      "detail": "frame 480 video_t=16.0 data_t=17.3598 active=1"
+    },
+    {
+      "check": "dropout_is_missing",
+      "pass": true,
+      "detail": "video_t=10.6333 temp_status=missing"
+    },
+    {
+      "check": "rollback_ambiguous_v1",
+      "pass": true,
+      "detail": "v1 pressure_status=ambiguous at data_t=14.3888"
+    },
+    {
+      "check": "rollback_repaired_v2",
+      "pass": true,
+      "detail": "v2 pressure_status=ok value=1063.9"
+    },
+    {
+      "check": "tail_no_data",
+      "pass": true,
+      "detail": "last frame video_t=19.9667 banner='no_data'"
+    },
+    {
+      "check": "unit_revision_hpa",
+      "pass": true,
+      "detail": "v1 101.5 kPa -> v2 1034.9 hPa (ratio 10.20)"
+    },
+    {
+      "check": "head_before_first_sample",
+      "pass": true,
+      "detail": "frame0 data_t=1.3366 status=missing"
+    }
+  ]
+}

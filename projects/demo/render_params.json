@@ -1,0 +1,31 @@
+{
+  "layout": "bottom",
+  "window_s": 6.0,
+  "fields": [
+    {
+      "name": "temperature",
+      "visible": true,
+      "method": "linear",
+      "max_gap": 1.5,
+      "display_unit": null,
+      "decimals": 1,
+      "color": "#ffb000"
+    },
+    {
+      "name": "pressure",
+      "visible": true,
+      "method": "linear",
+      "max_gap": 0.4,
+      "display_unit": null,
+      "decimals": 1,
+      "color": "#33ccff"
+    },
+    {
+      "name": "stim_pulse",
+      "visible": true,
+      "color": "#ff5555"
+    }
+  ],
+  "offset": 1.3366,
+  "rate": 1.001449
+}

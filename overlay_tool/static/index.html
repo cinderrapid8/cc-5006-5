@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>实验录像叠加工具</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>科学实验录像叠加工具</h1>
+  <span id="srcinfo"></span>
+</header>
+<main>
+  <section class="left">
+    <video id="player" controls muted></video>
+    <div id="anchorbox">
+      <h3>对齐锚点（人工）</h3>
+      <table id="anchors"></table>
+      <p id="aligninfo" class="note"></p>
+    </div>
+    <div id="qcbox">
+      <h3>QC 校验（闪光↔脉冲样例）</h3>
+      <ul id="qc"></ul>
+    </div>
+  </section>
+  <section class="right">
+    <h3>渲染参数</h3>
+    <label>数据版本
+      <select id="data_version"></select>
+    </label>
+    <label>时间偏移 offset (s)
+      <input type="range" id="offset" step="0.005">
+      <span id="offset_val"></span>
+    </label>
+    <label>速率 rate
+      <input type="number" id="rate" step="0.0001" value="1.0">
+    </label>
+    <label>布局
+      <select id="layout">
+        <option value="bottom">底部曲线条</option>
+        <option value="compact">紧凑曲线条</option>
+      </select>
+    </label>
+    <label>曲线窗口 (s)
+      <input type="number" id="window_s" step="0.5" value="6">
+    </label>
+    <div id="fieldcfg"></div>
+    <button id="render_btn">渲染候选</button>
+    <span id="render_status"></span>
+
+    <h3>候选渲染</h3>
+    <table id="renders"></table>
+    <h3>已导出（不可变，可复现）</h3>
+    <table id="exports"></table>
+  </section>
+</main>
+<script src="/static/app.js"></script>
+</body>
+</html>

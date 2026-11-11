@@ -1,0 +1,28 @@
+{
+  "anchors": [
+    {
+      "label": "flash#1 <-> pulse#1",
+      "video_time": 2.5,
+      "data_time": 3.85,
+      "note": "operator-picked brightest LED frame vs logger pulse"
+    },
+    {
+      "label": "flash#2 <-> pulse#2",
+      "video_time": 7.033,
+      "data_time": 8.35,
+      "note": "operator-picked brightest LED frame vs logger pulse"
+    },
+    {
+      "label": "flash#3 <-> pulse#3",
+      "video_time": 11.467,
+      "data_time": 12.85,
+      "note": "operator-picked brightest LED frame vs logger pulse"
+    },
+    {
+      "label": "flash#4 <-> pulse#4",
+      "video_time": 16.0,
+      "data_time": 17.35,
+      "note": "operator-picked brightest LED frame vs logger pulse"
+    }
+  ]
+}

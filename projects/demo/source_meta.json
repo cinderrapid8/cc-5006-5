@@ -1,0 +1,14 @@
+{
+  "fps": 30,
+  "width": 1024,
+  "height": 576,
+  "frames": 600,
+  "duration_s": 20.0,
+  "camera_clock_lag_s": 2.0,
+  "flash_video_times_s": [
+    2.5,
+    7.0,
+    11.5,
+    16.0
+  ]
+}

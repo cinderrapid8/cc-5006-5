@@ -1,0 +1,79 @@
+{
+  "render_id": "848930129549",
+  "params": {
+    "layout": "bottom",
+    "window_s": 6.0,
+    "fields": [
+      {
+        "name": "temperature",
+        "visible": true,
+        "method": "linear",
+        "max_gap": 1.5,
+        "display_unit": null,
+        "decimals": 1,
+        "color": "#ffb000",
+        "y_min": 21.288,
+        "y_max": 22.713
+      },
+      {
+        "name": "pressure",
+        "visible": true,
+        "method": "linear",
+        "max_gap": 0.4,
+        "display_unit": null,
+        "decimals": 1,
+        "color": "#33ccff",
+        "y_min": 100.424,
+        "y_max": 110.372
+      },
+      {
+        "name": "stim_pulse",
+        "visible": true,
+        "color": "#ff5555"
+      }
+    ],
+    "offset": 1.3566,
+    "rate": 1.001449,
+    "data_version": "v1",
+    "renderer": "overlay-1.1",
+    "fps": 30,
+    "width": 1024,
+    "height": 576,
+    "frame_limit": null,
+    "data_sha256": "46ad09f74dd7f1bd0529b54a00507e6b431b9a743b9647b7f11d0d23ab5466cd",
+    "anchors_sha256": "ea7d5ee2a8c3324651d6c44604c72b7fccc71846c9fa5cd8525581b831745490"
+  },
+  "qc": {
+    "frames": 600,
+    "seconds": 20.0,
+    "render_wall_s": 3.81,
+    "missing_readings": 394,
+    "ambiguous_readings": 87,
+    "rollback_intervals_s": {
+      "temperature": [],
+      "pressure": [
+        [
+          13.8,
+          16.6
+        ]
+      ]
+    },
+    "data_range_s": [
+      2.0,
+      17.975
+    ],
+    "alignment": {
+      "offset": 1.3365932731058137,
+      "rate": 1.0014493758804526,
+      "offset_lo": 1.3068065394327766,
+      "offset_hi": 1.366380006778849,
+      "residuals": [
+        0.009783287193054768,
+        -0.02978673367303708,
+        0.029786733673035304,
+        -0.009783287193053436
+      ]
+    },
+    "note": "offset range brackets all manual anchors; it is an empirical bracket, not a precision guarantee"
+  }
+}
