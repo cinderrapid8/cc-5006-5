@@ -26,13 +26,54 @@
 # 生成演示实验（源视频+两个数据版本+锚点），渲染候选、导出、QC
 .venv/bin/python -m overlay_tool.demo projects/demo
 
-# 启动网页（调整时间关系与布局，触发渲染/导出）
+# 启动网页（调整时间关系与布局，触发渲染/导出；可在左侧拖动时间预览）
 .venv/bin/python -m overlay_tool.app --project projects/demo --port 8000
 # 打开 http://127.0.0.1:8000
 
-# 测试
+# 测试（默认跳过慢速基准；-m benchmark 单独完整运行数据取样成本）
 .venv/bin/python -m pytest tests/
+.venv/bin/python -m pytest tests/ -m benchmark
+
+# 时基查询基准：成本分解 + 五级负载 + 稀疏化偏差
+.venv/bin/python -m overlay_tool.benchmark --out results/time_base_benchmark.json
 ```
+
+## 拖动预览与可失效时间索引
+
+长视频反复拖动时间时，旧路径每次都重新解析观测表并线性扫描定位样本。
+现在由 `time_index.py` 把每个数据版本解析一次为 `TimeIndex`（排序时间戳、
+二分/游标定位、回退区间预算），`scrub.py` 通过 `/api/preview` 提供两类**分离**
+的结果：
+
+- **显示曲线**（`field_curve`）：窗口内观测样本经分块 min/max 稀疏化为
+  ≤120 点折线，缺测段与回退段仍以红/黄色块按原解释着色，不用直线填满。
+  稀疏化只影响绘制，**绝不参与叠加或清单中的数值**。
+- **精确取值**（`exact_reading`）：与渲染器、`manifest.csv` 同源的
+  `SeriesSampler` 语义（线性/保持、最大缺口、回退 ambiguous、范围外 missing），
+  单位换算后单独返回；非单调或缺测段的解释保持不变。
+
+索引按「项目 + 版本 + 文件 sha256」注册在进程级 `TimeIndexRegistry` 中。
+同名数据文件被修订后，指纹变化即失效旧条目，只服务当前素材版本；也可显式
+`invalidate()`。后台渲染任务在启动前与发布前各核对一次素材指纹（数据 sha256
+与锚点 sha256），期间素材变更则标记 `stale`、不发布清单。
+
+## 数据取样成本（时基查询基准）
+
+`overlay_tool/benchmark.py` 对同一组时基查询比较两条实现，负载按**观测更密、
+缺测段更长**逐级增加（L1 稀疏 → L5 密集且长缺口，每级保留时钟回退结构）：
+
+- 基线（旧顺序）：每次查询 `解析 JSON/排序/回退区间 → 线性定位 → 重采样取值`；
+- 优化（新顺序）：`一次性建索引 → 二分（或单调游标）定位 → 同一重采样取值`；
+  显示折线构建是额外的独立路径，其稀疏值不替换精确读数。
+
+**计算顺序变化说明**：解析与回退区间计算从「每查询一次」提前到「每素材版本
+一次」；定位从全表线性扫描改为二分/游标；重采样公式、缺口判定、回退判定与
+单位换算的内部顺序完全未动。每次运行逐级记录定位耗时、取值耗时和稀疏折线对
+精确值的偏差（显示单位与归一化百分比）。状态不一致（missing/ambiguous 漂移）
+或数值与基线不符即退出码 1——出现定位耗时与数值偏差之外的行为退化时，撤回
+对应的数据取样优化（优化代码集中在 `time_index.py`，精确取值路径可直接回退到
+`SeriesSampler`）。最近一次报告见 `results/time_base_benchmark.json`。
+
 
 ## 演示场景
 

@@ -1,0 +1,234 @@
+{
+  "started_at": "2026-11-12T04:54:17",
+  "n_queries_per_level": 2000,
+  "span_s": 3600.0,
+  "cost_order_note": "baseline per query: parse -> linear locate -> read; optimized: index build once -> bisect/cursor locate -> read. Display curve building is a separate, additional path whose decimated values never replace exact readings.",
+  "levels": [
+    {
+      "level": "L1_sparse",
+      "n_samples": 3596,
+      "n_queries": 2000,
+      "baseline": {
+        "parse_ms_total": 715.97,
+        "locate_ms_total": 116.985,
+        "read_ms_total": 118.382,
+        "wall_ms": 952.151,
+        "per_query_ms": {
+          "parse": 0.3455,
+          "locate": 0.05927,
+          "read": 0.06004,
+          "total": 0.48092
+        }
+      },
+      "optimized": {
+        "index_build_ms": 0.913,
+        "locate_ms_total": 0.557,
+        "read_ms_total": 1.474,
+        "wall_ms": 2.325,
+        "per_query_ms": {
+          "locate": 0.00021,
+          "read": 0.00058,
+          "total": 0.00083
+        },
+        "cursor_locate_ms_total": 0.417,
+        "cursor_wall_ms": 0.56,
+        "cursor_per_query_ms": 0.00017
+      },
+      "display_curve": {
+        "per_window_ms_median": 0.0065,
+        "max_points": 120,
+        "max_deviation_display_unit": 0.076552,
+        "median_deviation_display_unit": 0.0,
+        "max_normalized_deviation_pct": 1.51645,
+        "coarse_24pts_max_normalized_deviation_pct": 1.51645,
+        "status_mismatches": 0
+      },
+      "correctness": {
+        "status_mismatches": 0,
+        "value_mismatches_vs_baseline": 0
+      },
+      "speedup_wall_x": 409.59
+    },
+    {
+      "level": "L2_nominal",
+      "n_samples": 18006,
+      "n_queries": 2000,
+      "baseline": {
+        "parse_ms_total": 3624.023,
+        "locate_ms_total": 611.585,
+        "read_ms_total": 617.305,
+        "wall_ms": 4854.169,
+        "per_query_ms": {
+          "parse": 1.62233,
+          "locate": 0.30706,
+          "read": 0.30467,
+          "total": 2.31233
+        }
+      },
+      "optimized": {
+        "index_build_ms": 4.329,
+        "locate_ms_total": 0.5,
+        "read_ms_total": 1.892,
+        "wall_ms": 2.695,
+        "per_query_ms": {
+          "locate": 0.00025,
+          "read": 0.00092,
+          "total": 0.00117
+        },
+        "cursor_locate_ms_total": 0.803,
+        "cursor_wall_ms": 0.917,
+        "cursor_per_query_ms": 0.00029
+      },
+      "display_curve": {
+        "per_window_ms_median": 0.02637,
+        "max_points": 120,
+        "max_deviation_display_unit": 0.0,
+        "median_deviation_display_unit": 0.0,
+        "max_normalized_deviation_pct": 0.0,
+        "coarse_24pts_max_normalized_deviation_pct": 0.0,
+        "status_mismatches": 0
+      },
+      "correctness": {
+        "status_mismatches": 0,
+        "value_mismatches_vs_baseline": 0
+      },
+      "speedup_wall_x": 1801.43
+    },
+    {
+      "level": "L3_dense",
+      "n_samples": 71783,
+      "n_queries": 2000,
+      "baseline": {
+        "parse_ms_total": 15089.973,
+        "locate_ms_total": 2545.544,
+        "read_ms_total": 2511.213,
+        "wall_ms": 20150.106,
+        "per_query_ms": {
+          "parse": 6.48046,
+          "locate": 1.1821,
+          "read": 1.17829,
+          "total": 9.03835
+        }
+      },
+      "optimized": {
+        "index_build_ms": 21.587,
+        "locate_ms_total": 0.664,
+        "read_ms_total": 2.316,
+        "wall_ms": 3.345,
+        "per_query_ms": {
+          "locate": 0.00025,
+          "read": 0.00108,
+          "total": 0.00137
+        },
+        "cursor_locate_ms_total": 2.573,
+        "cursor_wall_ms": 2.713,
+        "cursor_per_query_ms": 0.00092
+      },
+      "display_curve": {
+        "per_window_ms_median": 0.10802,
+        "max_points": 120,
+        "max_deviation_display_unit": 0.0,
+        "median_deviation_display_unit": 0.0,
+        "max_normalized_deviation_pct": 0.0,
+        "coarse_24pts_max_normalized_deviation_pct": 0.95255,
+        "status_mismatches": 0
+      },
+      "correctness": {
+        "status_mismatches": 0,
+        "value_mismatches_vs_baseline": 0
+      },
+      "speedup_wall_x": 6024.17
+    },
+    {
+      "level": "L4_very_dense",
+      "n_samples": 179010,
+      "n_queries": 2000,
+      "baseline": {
+        "parse_ms_total": 36106.227,
+        "locate_ms_total": 5888.372,
+        "read_ms_total": 5933.452,
+        "wall_ms": 47931.494,
+        "per_query_ms": {
+          "parse": 16.71869,
+          "locate": 2.86213,
+          "read": 2.87994,
+          "total": 22.94229
+        }
+      },
+      "optimized": {
+        "index_build_ms": 46.414,
+        "locate_ms_total": 0.656,
+        "read_ms_total": 2.338,
+        "wall_ms": 3.323,
+        "per_query_ms": {
+          "locate": 0.00029,
+          "read": 0.00113,
+          "total": 0.00142
+        },
+        "cursor_locate_ms_total": 5.805,
+        "cursor_wall_ms": 5.938,
+        "cursor_per_query_ms": 0.00204
+      },
+      "display_curve": {
+        "per_window_ms_median": 0.19469,
+        "max_points": 120,
+        "max_deviation_display_unit": 0.0,
+        "median_deviation_display_unit": 0.0,
+        "max_normalized_deviation_pct": 0.0,
+        "coarse_24pts_max_normalized_deviation_pct": 1.13367,
+        "status_mismatches": 0
+      },
+      "correctness": {
+        "status_mismatches": 0,
+        "value_mismatches_vs_baseline": 0
+      },
+      "speedup_wall_x": 14422.72
+    },
+    {
+      "level": "L5_dense_long_gaps",
+      "n_samples": 177607,
+      "n_queries": 2000,
+      "baseline": {
+        "parse_ms_total": 35650.839,
+        "locate_ms_total": 5740.787,
+        "read_ms_total": 5834.761,
+        "wall_ms": 47229.756,
+        "per_query_ms": {
+          "parse": 16.71362,
+          "locate": 2.80925,
+          "read": 2.8216,
+          "total": 22.56794
+        }
+      },
+      "optimized": {
+        "index_build_ms": 46.187,
+        "locate_ms_total": 0.706,
+        "read_ms_total": 2.497,
+        "wall_ms": 3.52,
+        "per_query_ms": {
+          "locate": 0.00029,
+          "read": 0.00121,
+          "total": 0.0015
+        },
+        "cursor_locate_ms_total": 5.792,
+        "cursor_wall_ms": 5.921,
+        "cursor_per_query_ms": 0.00204
+      },
+      "display_curve": {
+        "per_window_ms_median": 0.19806,
+        "max_points": 120,
+        "max_deviation_display_unit": 0.0,
+        "median_deviation_display_unit": 0.0,
+        "max_normalized_deviation_pct": 0.0,
+        "coarse_24pts_max_normalized_deviation_pct": 1.19843,
+        "status_mismatches": 0
+      },
+      "correctness": {
+        "status_mismatches": 0,
+        "value_mismatches_vs_baseline": 0
+      },
+      "speedup_wall_x": 13418.65
+    }
+  ],
+  "all_correct": true
+}

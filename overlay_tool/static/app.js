@@ -173,4 +173,131 @@ async function loadQc() {
 
 $("render_btn").onclick = startRender;
 $("data_version").onchange = buildFieldCfg;
-loadProject();
+loadProject().then(initScrub);
+
+// ---------- scrub preview: sparse display curve vs exact readings ----------
+
+let scrubSeq = 0;          // only the newest request may paint
+let scrubInflight = false;
+let scrubPending = null;
+let lastPreview = null;
+
+function initScrub() {
+  const duration = PROJECT.source.duration_s;
+  const bar = $("scrub");
+  bar.max = duration;
+  bar.addEventListener("input", () => scheduleScrub(parseFloat(bar.value)));
+  const player = $("player");
+  player.addEventListener("timeupdate", () => {
+    bar.value = player.currentTime;
+    scheduleScrub(player.currentTime);
+  });
+}
+
+function scheduleScrub(videoTime) {
+  scrubPending = videoTime;
+  if (scrubInflight) return;  // coalesce drag events; latest wins
+  requestAnimationFrame(() => {
+    if (scrubPending !== null) {
+      const t = scrubPending;
+      scrubPending = null;
+      fetchPreview(t);
+    }
+  });
+}
+
+async function fetchPreview(videoTime) {
+  const seq = ++scrubSeq;
+  scrubInflight = true;
+  try {
+    const body = await api("/api/preview", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ video_time_s: videoTime, params: collectParams() }),
+    });
+    if (seq !== scrubSeq) return;  // stale response: never painted
+    lastPreview = body;
+    paintPreview(body);
+  } catch (e) {
+    $("scrub_meta").textContent = "预览失败: " + e.message;
+  } finally {
+    scrubInflight = false;
+    if (scrubPending !== null) scheduleScrub(scrubPending);
+  }
+}
+
+function paintPreview(pv) {
+  $("scrub_meta").textContent =
+    `视频 ${fmt(pv.video_time_s)}s → 数据 ${fmt(pv.data_time_s)}s；` +
+    `素材版本 ${pv.material_token.version} (${pv.material_token.sha256.slice(0, 8)})`;
+
+  // exact readings: same path as the rendered overlay / manifest
+  $("scrub_readings").innerHTML = pv.readings.map(r => {
+    if (r.active !== undefined) {
+      return `<span class="reading ${r.active ? "evt-on" : ""}">` +
+        `${r.label}: ${r.active ? "事件激活" : "—"}</span>`;
+    }
+    const txt = r.status === "ok"
+      ? `${Number(r.value).toFixed(r.decimals)} ${r.unit}`
+      : (r.status === "missing" ? "缺测 —" : "rollback");
+    return `<span class="reading st-${r.status}">${r.label}: ${txt}</span>`;
+  }).join("");
+
+  drawCurves(pv);
+}
+
+function drawCurves(pv) {
+  const cv = $("scrub_canvas");
+  const ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  const lo = pv.data_time_s - pv.window_s, hi = pv.data_time_s;
+  const x = (t) => (t - lo) / (hi - lo) * W;
+  const cont = pv.curves.filter(c => c.segments);
+  const rowH = cont.length ? H / cont.length : H;
+
+  cont.forEach((c, row) => {
+    const top = row * rowH, bottom = top + rowH - 18;
+    const okPts = c.segments.filter(s => s.kind === "ok")
+      .flatMap(s => s.points.map(p => p[1]));
+    const hasOk = okPts.length > 0;
+    const vmin = hasOk ? Math.min(...okPts) : 0;
+    const vmax = hasOk ? Math.max(...okPts) : 1;
+    const y = (v) => bottom - (v - vmin) / ((vmax - vmin) || 1) * (bottom - top - 10) - 4;
+
+    ctx.fillStyle = "#20242c";
+    ctx.fillRect(0, top, W, rowH);
+    ctx.strokeStyle = "#555";
+    ctx.strokeRect(0.5, top + 0.5, W - 1, rowH - 1);
+    ctx.fillStyle = "#bbb";
+    ctx.font = "12px sans-serif";
+    ctx.fillText(`${c.name} [${c.display_unit}]`, 6, top + 13);
+
+    for (const s of c.segments) {
+      if (s.kind !== "ok") {
+        ctx.fillStyle = s.kind === "ambiguous"
+          ? "rgba(255,200,40,0.25)" : "rgba(255,60,60,0.22)";
+        ctx.fillRect(x(s.t0), top + 18, Math.max(1, x(s.t1) - x(s.t0)), bottom - top - 18);
+        continue;
+      }
+      ctx.strokeStyle = "#ffb000";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      s.points.forEach(([t, v], i) => {
+        const px = x(t), py = y(v);
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+    }
+  });
+
+  // event ticks across the bottom
+  const evts = pv.curves.filter(c => c.events).flatMap(c => c.events);
+  ctx.strokeStyle = "#ff5555";
+  for (const te of evts) {
+    const px = x(te);
+    ctx.beginPath();
+    ctx.moveTo(px, H - 14);
+    ctx.lineTo(px, H - 2);
+    ctx.stroke();
+  }
+}

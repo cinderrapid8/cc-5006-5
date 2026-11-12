@@ -7,6 +7,7 @@ Run:  python -m overlay_tool.app --project projects/demo --port 8000
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import threading
 from pathlib import Path
@@ -16,10 +17,15 @@ from flask import Flask, jsonify, request, send_from_directory
 from .demo import DEFAULT_PARAMS
 from .model import load_anchors
 from .render import render, complete_params
+from .scrub import preview, registry
 from .store import ProjectStore
 from .timeline import fit_alignment
 
 STATIC = Path(__file__).parent / "static"
+
+
+def _sha(raw: bytes | None) -> str | None:
+    return hashlib.sha256(raw).hexdigest() if raw is not None else None
 
 
 def create_app(project: Path) -> Flask:
@@ -72,10 +78,35 @@ def create_app(project: Path) -> Flask:
         if (store.render_dir(rid) / "manifest.csv").exists():
             return jsonify({"render_id": rid, "status": "done"})
 
+        # material snapshot: a background job may only publish results
+        # produced from the data version that existed when it started
+        material_sha = full["data_sha256"]
+        anchors_sha = full["anchors_sha256"]
+
         def work():
             jobs[rid] = {"status": "running"}
             try:
+                token = registry().token_for(project, params["data_version"])
+                anchors_file = store.anchors_path()
+                anchors_now = (anchors_file.read_bytes()
+                               if anchors_file.exists() else None)
+                if (token is None or token.sha256 != material_sha
+                        or _sha(anchors_now) != anchors_sha):
+                    jobs[rid] = {"status": "stale",
+                                 "error": "material changed before render start"}
+                    return
                 render(project, params)
+                # re-check before publishing: newer material invalidates it
+                token = registry().token_for(project, params["data_version"])
+                anchors_now = (anchors_file.read_bytes()
+                               if anchors_file.exists() else None)
+                if (token is None or token.sha256 != material_sha
+                        or _sha(anchors_now) != anchors_sha):
+                    jobs[rid] = {"status": "stale",
+                                 "error": "material changed during render; "
+                                          "result not published"}
+                    registry().invalidate(project, params["data_version"])
+                    return
                 jobs[rid] = {"status": "done"}
             except Exception as e:  # surfaced via /api/render/<rid>
                 jobs[rid] = {"status": "error", "error": str(e)}
@@ -93,6 +124,18 @@ def create_app(project: Path) -> Flask:
         if job:
             return jsonify({"render_id": rid, **job})
         return jsonify({"render_id": rid, "status": "unknown"}), 404
+
+    @app.post("/api/preview")
+    def preview_at():
+        body = request.get_json(force=True)
+        try:
+            video_time = float(body["video_time_s"])
+            params = body["params"]
+            if "data_version" not in params:
+                raise KeyError("data_version")
+            return jsonify(preview(store, params, video_time))
+        except (KeyError, ValueError, FileNotFoundError) as e:
+            return jsonify({"error": str(e)}), 400
 
     @app.post("/api/export")
     def export():
